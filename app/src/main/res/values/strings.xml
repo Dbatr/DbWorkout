@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Workout Diary</string>
+    <string name="my_workouts">Мои тренировки</string>
+    <string name="nav_home">Главная</string>
+    <string name="nav_calendar">Календарь</string>
+    <string name="nav_create_workout">Создать тренировку</string>
+    <string name="nav_exercises">Упражнения</string>
+    <string name="nav_settings">Настройки</string>
+    <string name="nav_about">О приложении</string>
+    <string name="menu">Меню</string>
+    <string name="back">Назад</string>
+    <string name="save">Сохранить</string>
+    <string name="edit">Редактировать</string>
+    <string name="delete">Удалить</string>
+    <string name="cancel">Отмена</string>
+    <string name="more">Подробнее</string>
+    <string name="add">Добавить</string>
+    <string name="previous">Назад</string>
+    <string name="next">Вперёд</string>
+
+    <string name="empty_week_title">На этой неделе тренировок пока нет</string>
+    <string name="empty_week_body">Начните с небольшой тренировки — запись займёт пару минут.</string>
+    <string name="create_workout">Создать тренировку</string>
+    <string name="add_workout">Добавить тренировку</string>
+    <plurals name="exercise_count">
+        <item quantity="one">%d упражнение</item>
+        <item quantity="few">%d упражнения</item>
+        <item quantity="many">%d упражнений</item>
+        <item quantity="other">%d упражнения</item>
+    </plurals>
+    <plurals name="set_count">
+        <item quantity="one">%d подход</item>
+        <item quantity="few">%d подхода</item>
+        <item quantity="many">%d подходов</item>
+        <item quantity="other">%d подхода</item>
+    </plurals>
+    <plurals name="reps_count">
+        <item quantity="one">%d повторение</item>
+        <item quantity="few">%d повторения</item>
+        <item quantity="many">%d повторений</item>
+        <item quantity="other">%d повторения</item>
+    </plurals>
+    <string name="reps_with_weight">%1$d × %2$s кг</string>
+
+    <string name="workout">Тренировка</string>
+    <string name="new_workout">Новая тренировка</string>
+    <string name="edit_workout">Редактирование</string>
+    <string name="date">Дата</string>
+    <string name="select_date">Выбрать дату</string>
+    <string name="workout_exercises">Упражнения</string>
+    <string name="add_exercise">Добавить упражнение</string>
+    <string name="workout_notes">Заметка к тренировке</string>
+    <string name="workout_notes_hint">Самочувствие, комментарии и наблюдения</string>
+    <string name="delete_workout_title">Удалить тренировку?</string>
+    <string name="delete_workout_body">Тренировка и все её подходы будут удалены с устройства.</string>
+    <string name="workout_saved">Тренировка сохранена</string>
+    <string name="workout_deleted">Тренировка удалена</string>
+    <string name="workout_not_found">Тренировка не найдена</string>
+    <string name="error_no_exercises">Добавьте хотя бы одно упражнение</string>
+    <string name="error_invalid_sets">Для каждого подхода укажите повторения больше нуля и корректный вес</string>
+    <string name="error_duplicate_date">На выбранную дату уже есть другая тренировка</string>
+    <string name="error_save_workout">Не удалось сохранить тренировку</string>
+    <string name="move_up">Переместить выше</string>
+    <string name="move_down">Переместить ниже</string>
+    <string name="remove_exercise">Удалить упражнение из тренировки</string>
+    <string name="no_exercises_in_workout">Упражнения ещё не добавлены</string>
+    <string name="date_field_description">Изменить дату тренировки</string>
+
+    <string name="choose_exercise">Выбор упражнения</string>
+    <string name="search_exercises">Поиск упражнений</string>
+    <string name="clear_search">Очистить поиск</string>
+    <string name="filter_all">Все</string>
+    <string name="no_exercises_found">Ничего не найдено</string>
+    <string name="no_exercises_found_body">Измените запрос или выберите другую категорию.</string>
+    <string name="custom_badge">Моё</string>
+    <string name="add_custom_exercise">Новое упражнение</string>
+    <string name="edit_custom_exercise">Изменить упражнение</string>
+    <string name="exercise_name">Название *</string>
+    <string name="exercise_category">Категория</string>
+    <string name="exercise_notes">Заметка</string>
+    <string name="exercise_notes_hint">Необязательное описание или подсказка</string>
+    <string name="error_empty_name">Введите название упражнения</string>
+    <string name="error_save_exercise">Не удалось сохранить. Возможно, такое название уже существует.</string>
+    <string name="exercise_saved">Упражнение сохранено</string>
+    <string name="delete_exercise_title">Удалить упражнение?</string>
+    <string name="delete_exercise_body">Пользовательское упражнение будет удалено из библиотеки.</string>
+    <string name="exercise_deleted">Упражнение удалено</string>
+    <string name="exercise_delete_failed">Нельзя удалить упражнение, которое уже используется в тренировке</string>
+
+    <string name="configure_exercise">Настройка упражнения</string>
+    <string name="set_number">Подход</string>
+    <string name="repetitions">Повторения</string>
+    <string name="weight_kg">Вес, кг</string>
+    <string name="add_set">Добавить подход</string>
+    <string name="remove_set">Удалить подход</string>
+    <string name="set_input_tip">Новый подход копирует значения предыдущего.</string>
+
+    <string name="calendar_month_empty">В этом месяце тренировок пока нет</string>
+    <string name="calendar_pick_hint">Выберите дату или откройте тренировку из списка месяца.</string>
+
+    <string name="app_theme">Тема приложения</string>
+    <string name="theme_system">Системная</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="weight_units">Единицы веса</string>
+    <string name="kilograms">Килограммы (кг)</string>
+    <string name="units_future_hint">В MVP используется только килограмм.</string>
+
+    <string name="about_description">Персональный дневник тренировок.</string>
+    <string name="version_format">Версия %s</string>
+    <string name="offline_note">Все данные хранятся только на этом устройстве. Приложение работает без интернета.</string>
+    <string name="workout_note_title">Заметка</string>
+
+    <string name="category_back">Спина</string>
+    <string name="category_chest">Грудь</string>
+    <string name="category_legs">Ноги</string>
+    <string name="category_shoulders">Плечи</string>
+    <string name="category_biceps">Бицепс</string>
+    <string name="category_triceps">Трицепс</string>
+    <string name="category_abs">Пресс</string>
+    <string name="category_cardio">Кардио</string>
+    <string name="category_other">Другое</string>
+</resources>
