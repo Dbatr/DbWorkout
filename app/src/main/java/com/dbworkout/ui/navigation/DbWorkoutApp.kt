@@ -48,10 +48,7 @@ import com.dbworkout.viewmodel.SettingsViewModel
 import com.dbworkout.viewmodel.WorkoutDetailViewModel
 import com.dbworkout.viewmodel.WorkoutEditorViewModel
 import com.dbworkout.viewmodel.viewModelFactory
-import java.time.LocalDate
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun DbWorkoutApp(
@@ -91,15 +88,10 @@ fun DbWorkoutApp(
         }
     }
 
-    fun openTodayEditor() {
-        scope.launch {
-            val existingId = container.workoutRepository.findWorkoutId(LocalDate.now())
-            withContext(Dispatchers.Main.immediate) {
-                navigateTopLevel(Routes.HOME)
-                editorViewModel.start(existingId)
-                editorStage = EditorStage.EDIT
-            }
-        }
+    fun openNewWorkoutEditor() {
+        navigateTopLevel(Routes.HOME)
+        editorViewModel.start(null)
+        editorStage = EditorStage.EDIT
     }
 
     BackHandler(enabled = editorStage != EditorStage.CLOSED) {
@@ -126,7 +118,7 @@ fun DbWorkoutApp(
                 HomeScreen(
                     viewModel = vm,
                     onNavigate = ::navigateTopLevel,
-                    onCreateWorkout = ::openTodayEditor,
+                    onCreateWorkout = ::openNewWorkoutEditor,
                     onOpenWorkout = { navController.navigate(Routes.workout(it)) },
                 )
             }
@@ -160,7 +152,7 @@ fun DbWorkoutApp(
                     viewModel = vm,
                     snackbarHostState = snackbarHostState,
                     onNavigate = ::navigateTopLevel,
-                    onCreateWorkout = ::openTodayEditor,
+                    onCreateWorkout = ::openNewWorkoutEditor,
                     onCreateExercise = { navController.navigate(Routes.customExercise()) },
                     onEditExercise = { navController.navigate(Routes.customExercise(it)) },
                 )
@@ -199,7 +191,7 @@ fun DbWorkoutApp(
                 CalendarScreen(
                     viewModel = vm,
                     onNavigate = ::navigateTopLevel,
-                    onCreateWorkout = ::openTodayEditor,
+                    onCreateWorkout = ::openNewWorkoutEditor,
                     onOpenWorkout = { navController.navigate(Routes.workout(it)) },
                 )
             }
@@ -207,11 +199,11 @@ fun DbWorkoutApp(
                 SettingsScreen(
                     viewModel = settingsViewModel,
                     onNavigate = ::navigateTopLevel,
-                    onCreateWorkout = ::openTodayEditor,
+                    onCreateWorkout = ::openNewWorkoutEditor,
                 )
             }
             composable(Routes.ABOUT) {
-                AboutScreen(onNavigate = ::navigateTopLevel, onCreateWorkout = ::openTodayEditor)
+                AboutScreen(onNavigate = ::navigateTopLevel, onCreateWorkout = ::openNewWorkoutEditor)
             }
         }
         when (editorStage) {

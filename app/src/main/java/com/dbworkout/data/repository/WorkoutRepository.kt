@@ -92,7 +92,7 @@ class WorkoutRepository(
         val now = System.currentTimeMillis()
         val sameDateWorkout = workoutDao.getEntityByDate(draft.date.toEpochDay())
         val workoutId = when {
-            draft.id == null && sameDateWorkout != null -> sameDateWorkout.id
+            draft.id == null && sameDateWorkout != null -> throw DuplicateWorkoutDateException()
             draft.id == null -> workoutDao.insertWorkout(
                 WorkoutEntity(
                     dateEpochDay = draft.date.toEpochDay(),
@@ -115,15 +115,6 @@ class WorkoutRepository(
                 )
                 draft.id
             }
-        }
-
-        if (sameDateWorkout != null && draft.id == null) {
-            workoutDao.updateWorkout(
-                sameDateWorkout.copy(
-                    notes = draft.notes?.trim()?.takeIf(String::isNotEmpty),
-                    updatedAt = now,
-                ),
-            )
         }
 
         workoutDao.deleteExercisesForWorkout(workoutId)
