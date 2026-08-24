@@ -1,7 +1,32 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
+}
+
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use(::load)
+    }
+}
+
+val releasePackagingRequested = gradle.startParameter.taskNames.any { taskName ->
+    taskName.endsWith("assembleRelease", ignoreCase = true) ||
+        taskName.endsWith("bundleRelease", ignoreCase = true) ||
+        taskName.endsWith("packageRelease", ignoreCase = true)
+}
+val injectedSigningAvailable = providers
+    .gradleProperty("android.injected.signing.store.file")
+    .isPresent
+
+if (releasePackagingRequested && !keystorePropertiesFile.exists() && !injectedSigningAvailable) {
+    throw GradleException(
+        "Release signing is not configured. Copy keystore.properties.example " +
+            "to keystore.properties and provide the release keystore values."
+    )
 }
 
 android {
@@ -23,8 +48,25 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
+    val releaseSigningConfig = if (keystorePropertiesFile.exists()) {
+        signingConfigs.create("release") {
+            fun requiredProperty(name: String): String =
+                requireNotNull(keystoreProperties.getProperty(name)) {
+                    "Missing '$name' in keystore.properties"
+                }
+
+            storeFile = rootProject.file(requiredProperty("storeFile"))
+            storePassword = requiredProperty("storePassword")
+            keyAlias = requiredProperty("keyAlias")
+            keyPassword = requiredProperty("keyPassword")
+        }
+    } else {
+        null
+    }
+
     buildTypes {
         release {
+            signingConfig = releaseSigningConfig
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
