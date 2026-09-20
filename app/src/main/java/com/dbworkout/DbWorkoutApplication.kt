@@ -11,6 +11,11 @@ class DbWorkoutApplication : Application() {
 
 class AppContainer(application: Application) {
     private val database = DbWorkoutDatabase.getInstance(application)
-    val workoutRepository = WorkoutRepository(database, database.exerciseDao(), database.workoutDao())
+    val workoutRepository = WorkoutRepository(
+        database,
+        database.exerciseDao(),
+        database.workoutDao(),
+        database.recordDao(),
+    )
     val settingsRepository = SettingsRepository(application)
 }

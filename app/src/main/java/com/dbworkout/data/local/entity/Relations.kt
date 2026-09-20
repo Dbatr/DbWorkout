@@ -26,3 +26,9 @@ data class WorkoutSummary(
     val dateEpochDay: Long,
     val exerciseCount: Int,
 )
+
+data class RecordWithExercise(
+    @Embedded val record: RecordEntity,
+    @Relation(parentColumn = "exerciseId", entityColumn = "id")
+    val exercise: ExerciseEntity,
+)

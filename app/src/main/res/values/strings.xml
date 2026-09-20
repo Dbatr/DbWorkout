@@ -6,6 +6,7 @@
     <string name="nav_calendar">Календарь</string>
     <string name="nav_create_workout">Создать тренировку</string>
     <string name="nav_exercises">Упражнения</string>
+    <string name="nav_records">Рекорды</string>
     <string name="nav_settings">Настройки</string>
     <string name="nav_about">О приложении</string>
     <string name="menu">Меню</string>
@@ -87,6 +88,26 @@
     <string name="delete_exercise_body">Пользовательское упражнение будет удалено из библиотеки.</string>
     <string name="exercise_deleted">Упражнение удалено</string>
     <string name="exercise_delete_failed">Нельзя удалить упражнение, которое уже используется в тренировке</string>
+
+    <string name="add_record">Добавить рекорд</string>
+    <string name="choose_exercise_for_record">Выбор упражнения</string>
+    <string name="no_records_title">Рекордов пока нет</string>
+    <string name="no_records_body">Добавьте упражнение и укажите вес — так появится первый рекорд.</string>
+    <string name="no_records_in_exercise">У этого упражнения ещё нет рекордов</string>
+    <string name="record_weight_format">%1$s кг</string>
+    <string name="new_record">Новый рекорд</string>
+    <string name="edit_record">Изменить рекорд</string>
+    <string name="record_saved">Рекорд сохранён</string>
+    <string name="record_deleted">Рекорд удалён</string>
+    <string name="record_delete_failed">Не удалось удалить рекорд</string>
+    <string name="delete_record_title">Удалить рекорд?</string>
+    <string name="delete_record_body">Запись о весе на эту дату будет удалена с устройства.</string>
+    <string name="record_weight_hint">Например, 82.5</string>
+    <string name="record_notes">Заметка</string>
+    <string name="record_notes_hint">Необязательный комментарий к рекорду</string>
+    <string name="error_record_weight">Укажите вес больше нуля</string>
+    <string name="error_duplicate_record">На эту дату уже есть рекорд</string>
+    <string name="error_save_record">Не удалось сохранить рекорд</string>
 
     <string name="configure_exercise">Настройка упражнения</string>
     <string name="set_number">Подход</string>

@@ -2,15 +2,19 @@ package com.dbworkout.data.repository
 
 import androidx.room.withTransaction
 import com.dbworkout.data.local.dao.ExerciseDao
+import com.dbworkout.data.local.dao.RecordDao
 import com.dbworkout.data.local.dao.WorkoutDao
 import com.dbworkout.data.local.database.DbWorkoutDatabase
 import com.dbworkout.data.local.entity.ExerciseEntity
 import com.dbworkout.data.local.entity.ExerciseSetEntity
+import com.dbworkout.data.local.entity.RecordEntity
 import com.dbworkout.data.local.entity.WorkoutEntity
 import com.dbworkout.data.local.entity.WorkoutExerciseEntity
 import com.dbworkout.data.local.entity.WorkoutWithExercises
 import com.dbworkout.model.Exercise
 import com.dbworkout.model.ExerciseCategory
+import com.dbworkout.model.ExerciseRecord
+import com.dbworkout.model.RecordListItem
 import com.dbworkout.model.Workout
 import com.dbworkout.model.WorkoutDraft
 import com.dbworkout.model.WorkoutExercise
@@ -25,6 +29,7 @@ class WorkoutRepository(
     private val database: DbWorkoutDatabase,
     private val exerciseDao: ExerciseDao,
     private val workoutDao: WorkoutDao,
+    private val recordDao: RecordDao,
 ) {
     fun observeExercises(): Flow<List<Exercise>> = exerciseDao.observeAll().map { entities ->
         entities.map(ExerciseEntity::toModel)
@@ -64,6 +69,70 @@ class WorkoutRepository(
     }
 
     suspend fun deleteCustomExercise(id: Long): Boolean = exerciseDao.deleteCustom(id) > 0
+
+    fun observeRecordExercises(): Flow<List<RecordListItem>> =
+        recordDao.observeAllWithExercise().map { records ->
+            records
+                .groupBy { it.record.exerciseId }
+                .map { (_, items) ->
+                    val latest = items.maxBy { it.record.dateEpochDay }
+                    RecordListItem(
+                        exercise = latest.exercise.toModel(),
+                        weightKg = latest.record.weightKg,
+                        date = LocalDate.ofEpochDay(latest.record.dateEpochDay),
+                        notes = latest.record.notes,
+                    )
+                }
+                .sortedByDescending { it.date }
+        }
+
+    fun observeRecordsForExercise(exerciseId: Long): Flow<List<ExerciseRecord>> =
+        recordDao.observeByExercise(exerciseId).map { entities -> entities.map(RecordEntity::toModel) }
+
+    suspend fun getRecord(id: Long): ExerciseRecord? = recordDao.getById(id)?.toModel()
+
+    suspend fun saveRecord(
+        id: Long?,
+        exerciseId: Long,
+        weightKg: Double,
+        date: LocalDate,
+        notes: String? = null,
+    ): Long {
+        val epochDay = date.toEpochDay()
+        val normalizedNotes = notes?.trim()?.takeIf(String::isNotEmpty)
+        val existing = recordDao.getByExerciseAndDate(exerciseId, epochDay)
+        return when {
+            id == null -> if (existing != null) {
+                recordDao.update(existing.copy(weightKg = weightKg, notes = normalizedNotes))
+                existing.id
+            } else {
+                recordDao.insert(
+                    RecordEntity(
+                        exerciseId = exerciseId,
+                        weightKg = weightKg,
+                        dateEpochDay = epochDay,
+                        createdAt = System.currentTimeMillis(),
+                        notes = normalizedNotes,
+                    ),
+                )
+            }
+            existing != null && existing.id != id -> throw DuplicateRecordDateException()
+            else -> {
+                val current = requireNotNull(recordDao.getById(id))
+                recordDao.update(
+                    current.copy(
+                        exerciseId = exerciseId,
+                        weightKg = weightKg,
+                        dateEpochDay = epochDay,
+                        notes = normalizedNotes,
+                    ),
+                )
+                id
+            }
+        }
+    }
+
+    suspend fun deleteRecord(id: Long) = recordDao.deleteById(id)
 
     fun observeWorkouts(start: LocalDate, end: LocalDate): Flow<List<WorkoutListItem>> =
         workoutDao.observeSummaries(start.toEpochDay(), end.toEpochDay()).map { summaries ->
@@ -148,7 +217,17 @@ class WorkoutRepository(
 
 class DuplicateWorkoutDateException : IllegalStateException()
 
+class DuplicateRecordDateException : IllegalStateException()
+
 private fun ExerciseEntity.toModel() = Exercise(id, name, category, isCustom, notes)
+
+private fun RecordEntity.toModel() = ExerciseRecord(
+    id = id,
+    exerciseId = exerciseId,
+    weightKg = weightKg,
+    date = LocalDate.ofEpochDay(dateEpochDay),
+    notes = notes,
+)
 
 private fun WorkoutWithExercises.toModel() = Workout(
     id = workout.id,

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.FitnessCenter
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Info
@@ -47,6 +48,7 @@ private val drawerItems = listOf(
     DrawerItem(Routes.CALENDAR, R.string.nav_calendar, Icons.Rounded.CalendarMonth),
     DrawerItem("create", R.string.nav_create_workout, Icons.Rounded.Add),
     DrawerItem(Routes.EXERCISES, R.string.nav_exercises, Icons.Rounded.FitnessCenter),
+    DrawerItem(Routes.RECORDS, R.string.nav_records, Icons.Rounded.EmojiEvents),
     DrawerItem(Routes.SETTINGS, R.string.nav_settings, Icons.Rounded.Settings),
     DrawerItem(Routes.ABOUT, R.string.nav_about, Icons.Rounded.Info),
 )

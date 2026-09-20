@@ -10,6 +10,7 @@ import com.dbworkout.model.WorkoutDraft
 import com.dbworkout.model.WorkoutExerciseDraft
 import com.dbworkout.model.WorkoutSetDraft
 import java.time.LocalDate
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -30,7 +31,7 @@ class WorkoutRepositoryTest {
             ApplicationProvider.getApplicationContext(),
             DbWorkoutDatabase::class.java,
         ).build()
-        repository = WorkoutRepository(database, database.exerciseDao(), database.workoutDao())
+        repository = WorkoutRepository(database, database.exerciseDao(), database.workoutDao(), database.recordDao())
         exerciseId = database.exerciseDao().insert(
             ExerciseEntity(
                 name = "Тестовое упражнение",
@@ -75,6 +76,64 @@ class WorkoutRepositoryTest {
         assertEquals(yesterdayId, repository.findWorkoutId(yesterday))
         assertEquals("Сегодня", repository.getWorkout(todayId)?.notes)
         assertEquals("Вчера", repository.getWorkout(yesterdayId)?.notes)
+    }
+
+    @Test
+    fun savingRecordOnSameDateReplacesWeight() = runBlocking {
+        val date = LocalDate.of(2026, 8, 5)
+        val firstId = repository.saveRecord(id = null, exerciseId = exerciseId, weightKg = 80.0, date = date)
+
+        val secondId = repository.saveRecord(id = null, exerciseId = exerciseId, weightKg = 82.5, date = date)
+
+        assertEquals(firstId, secondId)
+        val records = repository.observeRecordsForExercise(exerciseId).first()
+        assertEquals(1, records.size)
+        assertEquals(82.5, records.single().weightKg, 0.0)
+    }
+
+    @Test
+    fun recordListKeepsLatestRecordPerExercise() = runBlocking {
+        val first = LocalDate.of(2026, 8, 5)
+        val second = LocalDate.of(2026, 8, 10)
+        repository.saveRecord(id = null, exerciseId = exerciseId, weightKg = 80.0, date = first)
+        repository.saveRecord(id = null, exerciseId = exerciseId, weightKg = 85.0, date = second)
+
+        val items = repository.observeRecordExercises().first()
+
+        assertEquals(1, items.size)
+        assertEquals(exerciseId, items.single().exercise.id)
+        assertEquals(85.0, items.single().weightKg, 0.0)
+        assertEquals(second, items.single().date)
+    }
+
+    @Test
+    fun editingRecordToOccupiedDateFails() = runBlocking {
+        val first = LocalDate.of(2026, 8, 5)
+        val second = LocalDate.of(2026, 8, 10)
+        val firstId = repository.saveRecord(id = null, exerciseId = exerciseId, weightKg = 80.0, date = first)
+        repository.saveRecord(id = null, exerciseId = exerciseId, weightKg = 85.0, date = second)
+
+        assertThrows(DuplicateRecordDateException::class.java) {
+            runBlocking {
+                repository.saveRecord(id = firstId, exerciseId = exerciseId, weightKg = 81.0, date = second)
+            }
+        }
+        Unit
+    }
+
+    @Test
+    fun savingRecordStoresTrimmedNotes() = runBlocking {
+        val date = LocalDate.of(2026, 8, 5)
+        val id = repository.saveRecord(
+            id = null,
+            exerciseId = exerciseId,
+            weightKg = 80.0,
+            date = date,
+            notes = "  рекорд на выносливость  ",
+        )
+
+        val record = requireNotNull(repository.getRecord(id))
+        assertEquals("рекорд на выносливость", record.notes)
     }
 
     private fun draft(date: LocalDate, notes: String, reps: Int) = WorkoutDraft(

@@ -57,3 +57,18 @@ data class WorkoutSetDraft(
     val reps: Int,
     val weightKg: Double?,
 )
+
+data class ExerciseRecord(
+    val id: Long,
+    val exerciseId: Long,
+    val weightKg: Double,
+    val date: LocalDate,
+    val notes: String?,
+)
+
+data class RecordListItem(
+    val exercise: Exercise,
+    val weightKg: Double,
+    val date: LocalDate,
+    val notes: String?,
+)

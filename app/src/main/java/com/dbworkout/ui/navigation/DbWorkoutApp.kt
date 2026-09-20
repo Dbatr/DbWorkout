@@ -38,12 +38,19 @@ import com.dbworkout.ui.screens.editor.WorkoutEditorScreen
 import com.dbworkout.ui.screens.exercises.CustomExerciseScreen
 import com.dbworkout.ui.screens.exercises.ExerciseLibraryScreen
 import com.dbworkout.ui.screens.home.HomeScreen
+import com.dbworkout.ui.screens.records.RecordEditorScreen
+import com.dbworkout.ui.screens.records.RecordExerciseSelectScreen
+import com.dbworkout.ui.screens.records.RecordHistoryScreen
+import com.dbworkout.ui.screens.records.RecordListScreen
 import com.dbworkout.ui.screens.settings.SettingsScreen
 import com.dbworkout.ui.screens.workout.WorkoutDetailScreen
 import com.dbworkout.viewmodel.CalendarViewModel
 import com.dbworkout.viewmodel.CustomExerciseViewModel
 import com.dbworkout.viewmodel.ExerciseListViewModel
 import com.dbworkout.viewmodel.HomeViewModel
+import com.dbworkout.viewmodel.RecordEditorViewModel
+import com.dbworkout.viewmodel.RecordHistoryViewModel
+import com.dbworkout.viewmodel.RecordListViewModel
 import com.dbworkout.viewmodel.SettingsViewModel
 import com.dbworkout.viewmodel.WorkoutDetailViewModel
 import com.dbworkout.viewmodel.WorkoutEditorViewModel
@@ -61,6 +68,7 @@ fun DbWorkoutApp(
     val savedMessage = stringResource(R.string.workout_saved)
     val deletedMessage = stringResource(R.string.workout_deleted)
     val exerciseSavedMessage = stringResource(R.string.exercise_saved)
+    val recordSavedMessage = stringResource(R.string.record_saved)
     val editorViewModel: WorkoutEditorViewModel = viewModel(
         key = "workout-editor",
         factory = viewModelFactory { WorkoutEditorViewModel(container.workoutRepository) },
@@ -181,6 +189,70 @@ fun DbWorkoutApp(
                             editorStage = EditorStage.SELECT
                         }
                         scope.launch { snackbarHostState.showSnackbar(exerciseSavedMessage) }
+                    },
+                )
+            }
+            composable(Routes.RECORDS) {
+                val vm: RecordListViewModel = viewModel(factory = viewModelFactory {
+                    RecordListViewModel(container.workoutRepository)
+                })
+                RecordListScreen(
+                    viewModel = vm,
+                    onNavigate = ::navigateTopLevel,
+                    onCreateWorkout = ::openNewWorkoutEditor,
+                    onAddRecord = { navController.navigate(Routes.RECORD_SELECT) },
+                    onOpenHistory = { navController.navigate(Routes.recordHistory(it)) },
+                )
+            }
+            composable(Routes.RECORD_SELECT) {
+                val vm: ExerciseListViewModel = viewModel(
+                    key = "record-exercise-selection",
+                    factory = viewModelFactory { ExerciseListViewModel(container.workoutRepository) },
+                )
+                RecordExerciseSelectScreen(
+                    viewModel = vm,
+                    onBack = { navController.popBackStack() },
+                    onSelect = { exercise -> navController.navigate(Routes.recordEditor(exercise.id)) },
+                )
+            }
+            composable(
+                route = Routes.RECORD_HISTORY,
+                arguments = listOf(navArgument("exerciseId") { type = NavType.LongType }),
+            ) { entry ->
+                val exerciseId = requireNotNull(entry.arguments?.getLong("exerciseId"))
+                val vm: RecordHistoryViewModel = viewModel(
+                    factory = viewModelFactory { RecordHistoryViewModel(exerciseId, container.workoutRepository) },
+                )
+                RecordHistoryScreen(
+                    viewModel = vm,
+                    onBack = { navController.popBackStack() },
+                    onAdd = { navController.navigate(Routes.recordEditor(exerciseId)) },
+                    onEdit = { recordId -> navController.navigate(Routes.recordEditor(exerciseId, recordId)) },
+                )
+            }
+            composable(
+                route = Routes.RECORD_EDITOR,
+                arguments = listOf(
+                    navArgument("exerciseId") { type = NavType.LongType },
+                    navArgument("recordId") { type = NavType.LongType; defaultValue = -1L },
+                ),
+            ) { entry ->
+                val exerciseId = requireNotNull(entry.arguments?.getLong("exerciseId"))
+                val recordId = entry.arguments?.getLong("recordId")?.takeIf { it >= 0 }
+                val vm: RecordEditorViewModel = viewModel(
+                    factory = viewModelFactory {
+                        RecordEditorViewModel(exerciseId, recordId, container.workoutRepository)
+                    },
+                )
+                RecordEditorScreen(
+                    viewModel = vm,
+                    onBack = { navController.popBackStack() },
+                    onSaved = {
+                        navController.navigate(Routes.RECORDS) {
+                            popUpTo(Routes.RECORDS) { inclusive = false }
+                            launchSingleTop = true
+                        }
+                        scope.launch { snackbarHostState.showSnackbar(recordSavedMessage) }
                     },
                 )
             }
